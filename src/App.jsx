@@ -6,29 +6,30 @@ import { Toggle } from "./components/Toggle/Toggle";
 import Heading from "./components/Heading/Heading";
 import Item from "./components/Item/Item";
 
-let data = [
-  // {
-  //   id: 1,
-  //   title: "I am done with react",
-  // },
-  // {
-  //   id: 2,
-  //   title: "I know about react what your question?",
-  // },
-  // {
-  //   id: 3,
-  //   title: "got it",
-  // },
-];
+// let data = [
+//   // {
+//   //   id: 1,
+//   //   title: "I am done with react",
+//   // },
+//   // {
+//   //   id: 2,
+//   //   title: "I know about react what your question?",
+//   // },
+//   // {
+//   //   id: 3,
+//   //   title: "got it",
+//   // },
+// ];
 
 export const App = () => {
   const preference = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const [isDark, setIsDark] = useLocalStorage("isDark", preference);
 
-  const [list, setList] = useState(data);
+  const [list, setList] = useLocalStorage("todoList", []);
   const [newElementTitle, setNewElementTitle] = useState("");
 
   const addEleIntoList = () => {
+    
     // Find the maximum id in the current list
     const maxId = Math.max(...list.map(item => item.id));
 
@@ -52,6 +53,19 @@ export const App = () => {
     setList(list.filter((e) => e.id !== x));
   };
 
+  const addEle = (color) => {
+    const maxId = Math.max(...list.map(item => item.id));
+    const nextId = maxId + 1;
+
+    let newEle = {
+      id: nextId,
+      title: `New Item - ${nextId}`,
+      color: color,
+    };
+
+    setList([...list, newEle]);
+  };
+
   return (
     <div className="App" data-theme={isDark ? "dark" : "light"}>
       <Toggle isChecked={isDark} handleChange={() => setIsDark(!isDark)} />
@@ -72,7 +86,11 @@ export const App = () => {
 
         {list.map((x, index) => (
           <React.Fragment key={index}>
-            <Item title={x.title} removeEle={() => deleteEle(x.id)} />
+            <Item title={x.title}   removeEle={() => {
+            setList(list.filter((e) => e.id !== x.id));
+          }}
+          addEle={addEle}
+          itemColor={x.color}  />
           </React.Fragment>
         ))}
       </div>
